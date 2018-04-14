@@ -2,7 +2,7 @@ package vn.smartdev.book.manager.model;
 
 import java.io.Serializable;
 
-public class EBook implements Serializable{
+public class EBookResponse implements Serializable{
 
     private String name;
 

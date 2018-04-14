@@ -23,7 +23,7 @@ public class WebDriverProvider {
 
     private static WebDriver webDriver;
 
-    static void setupWebDriver(){
+    static void setup() {
         log.info("Setup web-driver....");
         System.setProperty(WEB_DRIVER_NAME, WEB_DRIVER_PATH);
         log.info("Web-driver was setup success.");
