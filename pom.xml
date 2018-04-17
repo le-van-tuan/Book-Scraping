@@ -8,6 +8,8 @@
     <artifactId>books-downloading-manger</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+   <packaging>war</packaging>
+    
     <build>
         <plugins>
             <plugin>
@@ -20,6 +22,14 @@
             </plugin>
         </plugins>
     </build>
+
+    <properties>
+        <html-unit-version>1.8</html-unit-version>
+        <google-client-api-version>1.23.0</google-client-api-version>
+        <google-driver-service-version>v3-rev108-1.23.0</google-driver-service-version>
+        <jstl-version>1.2</jstl-version>
+        <commons-logging-version>1.1</commons-logging-version>
+    </properties>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -49,68 +59,40 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-jasper</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
-
 
         <!-- Google APIs -->
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>
-            <version>1.23.0</version>
+            <version>${google-client-api-version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.apis</groupId>
             <artifactId>google-api-services-drive</artifactId>
-            <version>v3-rev108-1.23.0</version>
+            <version>${google-driver-service-version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.oauth-client</groupId>
             <artifactId>google-oauth-client-jetty</artifactId>
-            <version>1.23.0</version>
+            <version>${google-client-api-version}</version>
         </dependency>
 
-
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-taglibs</artifactId>
-            <version>4.2.1.RELEASE</version>
-        </dependency>
-
-        <dependency>
-            <groupId>jstl</groupId>
-            <artifactId>jstl</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-jasper</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jdt.core.compiler</groupId>
-            <artifactId>ecj</artifactId>
-            <version>4.6.1</version>
-        </dependency>
-        
+        <!--Logging -->
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging-api</artifactId>
-            <version>1.1</version>
+            <version>${commons-logging-version}</version>
         </dependency>
 
         <!-- SELENIUM -->
         <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-java</artifactId>
-            <version>3.4.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-firefox-driver</artifactId>
-            <version>3.0.1</version>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.10.2</version>
         </dependency>
 
         <!-- Liquibase -->
@@ -130,5 +112,4 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
     </dependencies>
-
 </project>

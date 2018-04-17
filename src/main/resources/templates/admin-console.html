@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin console</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+
+    <script type="text/javascript" th:src="@{book-scrapping-app.js}"></script>
+    <script type="text/javascript" th:src="@{/controller/book-scrapping-controller.js}"></script>
+    <script type="text/javascript" th:src="@{/service/book-scrapping-service.js}"></script>
+</head>
+<body style="background: transparent;" ng-app="bookScrappingModule" ng-controller="BookScrappingController as ctrl">
+<center>
+    <h5 style="color: #31a5ce; font-weight: 700; font-size: 35px; position: relative;">Welcome to Book-Scrapping admin console</h5>
+
+    <div class="row">
+        <div class="col-sm-3">
+            <button type="button" class="btn btn-default" ng-click="ctrl.testJsoup()">Test Jsoup</button>
+        </div>
+        <div class="col-sm-3">
+            <button type="button" class="btn btn-success">Success</button>
+        </div>
+        <div class="col-sm-3">
+            <button type="button" class="btn btn-warning">Warning</button>
+        </div>
+        <div class="col-sm-3">
+            <button type="button" class="btn btn-danger">Danger</button>
+        </div>
+    </div>
+</center>
+</body>
+</html>

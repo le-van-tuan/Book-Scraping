@@ -6,12 +6,13 @@ import com.google.api.services.drive.model.FileList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
-import vn.smartdev.book.manager.provider.CredentialsGoogleProvider;
 import vn.smartdev.book.manager.model.FilesDriver;
+import vn.smartdev.book.manager.provider.CredentialsGoogleProvider;
 import vn.smartdev.book.manager.service.GoogleDriverService;
 import vn.smartdev.book.manager.utils.GoogleDriverAttributes;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,10 +62,14 @@ public class GoogleDriverServiceImpl implements GoogleDriverService {
         fileMetadata.setName(name);
         fileMetadata.setMimeType(GoogleDriverAttributes.FOLDER_MINE_TYPE);
 
-        File file = googleDriver.files().create(fileMetadata)
+        return googleDriver.files().create(fileMetadata)
                 .setFields("id")
                 .execute();
+    }
 
-        return file;
+    @Override
+    public InputStream exportFileToInputStream(String fileId) throws IOException {
+        return googleDriver.files().export(fileId, GoogleDriverAttributes.PDF_APPLICATION_FILE_TYPE)
+                .executeAsInputStream();
     }
 }

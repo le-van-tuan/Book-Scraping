@@ -17,7 +17,7 @@ public class ErrorHandling {
 
     @ExceptionHandler(IOException.class)
     @ResponseBody
-    public ResponseEntity<?> handleIOException(IOException ex){
+    public ResponseEntity<?> handleIOException(IOException ex) {
         log.error("IOException..");
         log.error("IOException", ex);
         return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
