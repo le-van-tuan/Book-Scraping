@@ -13,8 +13,14 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter implements WebAttribut
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/js/**")
-                .addResourceLocations("classpath:/static/**", "classpath:/static/");
+        registry.addResourceHandler(
+                "/*",
+                "/controller/**",
+                "/service/**")
+                .addResourceLocations(
+                        "classpath:/static/",
+                        "classpath:/static/controller/",
+                        "classpath:/static/service/");
     }
 
     @Override
