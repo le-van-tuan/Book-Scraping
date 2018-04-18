@@ -3,6 +3,9 @@ package vn.smartdev.book.manager.model;
 import java.io.Serializable;
 
 public class LinkContent implements Serializable {
+
+    private String id;
+
     private String linkTitle;
 
     private String linkUrl;
@@ -26,8 +29,17 @@ public class LinkContent implements Serializable {
     @Override
     public String toString() {
         return "LinkContent{" +
-                "linkTitle='" + linkTitle + '\'' +
+                "id='" + id + '\'' +
+                ", linkTitle='" + linkTitle + '\'' +
                 ", linkUrl='" + linkUrl + '\'' +
                 '}';
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

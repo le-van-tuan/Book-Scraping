@@ -9,10 +9,10 @@ bookScrappingApp.controller('BookScrappingController', ['$scope', 'BookScrapping
     self.error = 'error';
     self.done = 'done';
 
-    self.testJsoup = testJsoup;
+    self.downloadBook = downloadBook;
 
-    function testJsoup(link) {
-        console.info('here is link : ' + link);
-        BookScrappingService.testing();
+    function downloadBook(id) {
+        console.info('Start download book on link : ' + id);
+        BookScrappingService.downloadBook(id);
     }
 }]);

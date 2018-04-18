@@ -20,8 +20,8 @@
 <center th:each="linkContent : ${linkContents}">
     <div class="row" style="padding-top: 30px;">
         <div class="col-sm-3">
-            <button type="button" class="btn btn-success" th:attr="ng-click='testJsoup(\''+${linkContent.linkUrl}+'\')'" th:text="${linkContent.linkTitle}"></button>
-            <b style="color: #ff6936">status : {{ctrl.waiting}}</b>
+            <button type="button" class="btn btn-success" th:attr="ng-click='ctrl.downloadBook(\''+${linkContent.id}+'\')'" th:text="${linkContent.linkTitle}"></button>
+            <b style="color: #ff6936; padding-left: 15px;">status : {{ctrl.waiting}}</b>
         </div>
     </div>
 </center>

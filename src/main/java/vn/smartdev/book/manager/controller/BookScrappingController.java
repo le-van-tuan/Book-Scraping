@@ -3,15 +3,12 @@ package vn.smartdev.book.manager.controller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import vn.smartdev.book.manager.model.LinkContent;
+import vn.smartdev.book.manager.provider.PropertyProvider;
 import vn.smartdev.book.manager.service.WebScraperService;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 public class BookScrappingController {
@@ -20,10 +17,12 @@ public class BookScrappingController {
     @Autowired
     private WebScraperService webScraperService;
 
-    @RequestMapping(value = "/testing")
+    @RequestMapping(value = "/download/{id}", method = RequestMethod.GET)
     @ResponseBody
-    public void testing() throws IOException {
-        log.info("angular js was contact to me!");
-        log.info("Title from google website : " + webScraperService.getTitleFromUrl("http://google.com"));
+    public void downloadBook(@PathVariable(name = "id") String id) throws IOException {
+        LinkContent linkContent = PropertyProvider.getLinkContentById(id);
+        log.info("downloading book from url :" + linkContent.getLinkUrl());
+
+        webScraperService.scrapBookFromUrl(linkContent);
     }
 }

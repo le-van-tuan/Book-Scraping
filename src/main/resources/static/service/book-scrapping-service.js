@@ -1,14 +1,8 @@
 'use strict';
-bookScrappingApp.factory('BookScrappingService', ['$http', '$q', 'urls' , function ($http, $q, urls) {
-    var factory = {
-        testing : testing
-    };
-    return factory;
-
-    function testing() {
+bookScrappingApp.service('BookScrappingService', ['$http', '$q', 'urls' , function ($http, $q, urls) {
+    this.downloadBook = function downloadBook(id) {
         var deferred = $q.defer();
-
-        $http.get(urls.TESTING)
+        $http.get(urls.DOWNLOAD + id)
             .then(function (response) {
                     deferred.resolve(response);
                 },
