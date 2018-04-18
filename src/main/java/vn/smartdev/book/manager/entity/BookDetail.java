@@ -39,6 +39,13 @@ public class BookDetail extends BaseEntity implements Serializable {
     @Column
     private String image;
 
+    @Column(name = "link_download")
+    private String linkDownload;
+
+    @Column(name = "state")
+    @Enumerated(EnumType.STRING)
+    private DownloadState state;
+
     @OneToOne(fetch = FetchType.LAZY, targetEntity = Book.class)
     @JoinColumn(name = "book_reference_id", nullable = false)
     private Book book;
@@ -131,6 +138,30 @@ public class BookDetail extends BaseEntity implements Serializable {
         this.image = image;
     }
 
+    public String getLinkDownload() {
+        return linkDownload;
+    }
+
+    public void setLinkDownload(String linkDownload) {
+        this.linkDownload = linkDownload;
+    }
+
+    public DownloadState getState() {
+        return state;
+    }
+
+    public void setState(DownloadState state) {
+        this.state = state;
+    }
+
+    public Book getBook() {
+        return book;
+    }
+
+    public void setBook(Book book) {
+        this.book = book;
+    }
+
     @Override
     public String toString() {
         return "BookDetail{" +
@@ -145,6 +176,8 @@ public class BookDetail extends BaseEntity implements Serializable {
                 ", driverDirectory='" + driverDirectory + '\'' +
                 ", bookDescription='" + bookDescription + '\'' +
                 ", image='" + image + '\'' +
+                ", linkDownload='" + linkDownload + '\'' +
+                ", state=" + state +
                 ", book=" + book +
                 '}';
     }

@@ -6,15 +6,14 @@ import java.util.Date;
 
 public class BaseEntity implements Serializable {
 
-
     @Column(name = "created_at")
-    private Date createdAt;
+    private Date createdAt = new Date();
 
     @Column(name = "last_updated_at")
-    private Date lastUpdatedAt;
+    private Date lastUpdatedAt = new Date();
 
     @Column(name = "version_no")
-    private int versionNo;
+    private int versionNo = 1;
 
     public Date getCreatedAt() {
         return createdAt;
