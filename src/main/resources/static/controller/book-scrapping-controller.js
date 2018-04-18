@@ -3,9 +3,16 @@ bookScrappingApp.controller('BookScrappingController', ['$scope', 'BookScrapping
 
     var self = this;
 
+    /*Download status*/
+    self.waiting = "waiting";
+    self.loading = "loading";
+    self.error = 'error';
+    self.done = 'done';
+
     self.testJsoup = testJsoup;
 
-    function testJsoup() {
-        console.info('Hello Tuan');
+    function testJsoup(link) {
+        console.info('here is link : ' + link);
+        BookScrappingService.testing();
     }
 }]);

@@ -16,19 +16,12 @@
 <body style="background: transparent;" ng-app="bookScrappingModule" ng-controller="BookScrappingController as ctrl">
 <center>
     <h5 style="color: #31a5ce; font-weight: 700; font-size: 35px; position: relative;">Welcome to Book-Scrapping admin console</h5>
-
-    <div class="row">
+</center>
+<center th:each="linkContent : ${linkContents}">
+    <div class="row" style="padding-top: 30px;">
         <div class="col-sm-3">
-            <button type="button" class="btn btn-default" ng-click="ctrl.testJsoup()">Test Jsoup</button>
-        </div>
-        <div class="col-sm-3">
-            <button type="button" class="btn btn-success">Success</button>
-        </div>
-        <div class="col-sm-3">
-            <button type="button" class="btn btn-warning">Warning</button>
-        </div>
-        <div class="col-sm-3">
-            <button type="button" class="btn btn-danger">Danger</button>
+            <button type="button" class="btn btn-success" th:attr="ng-click='testJsoup(\''+${linkContent.linkUrl}+'\')'" th:text="${linkContent.linkTitle}"></button>
+            <b style="color: #ff6936">status : {{ctrl.waiting}}</b>
         </div>
     </div>
 </center>

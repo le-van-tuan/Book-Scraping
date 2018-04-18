@@ -3,15 +3,17 @@ package vn.smartdev.book.manager.controller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import vn.smartdev.book.manager.service.WebScraperService;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
-@RequestMapping(value = "/book-downloading")
 public class BookScrappingController {
     static final Log log = LogFactory.getFactory().getInstance(BookScrappingController.class);
 

@@ -29,7 +29,7 @@
         <google-driver-service-version>v3-rev108-1.23.0</google-driver-service-version>
         <jstl-version>1.2</jstl-version>
         <commons-logging-version>1.1</commons-logging-version>
-        <angular.version>1.4.9</angular.version>
+        <angular.version>1.6.4</angular.version>
     </properties>
 
     <parent>
