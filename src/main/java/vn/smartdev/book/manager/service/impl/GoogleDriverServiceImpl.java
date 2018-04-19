@@ -1,8 +1,11 @@
 package vn.smartdev.book.manager.service.impl;
 
+import com.google.api.client.http.FileContent;
+import com.google.api.client.http.InputStreamContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
@@ -13,6 +16,7 @@ import vn.smartdev.book.manager.utils.GoogleDriverAttributes;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,8 +72,22 @@ public class GoogleDriverServiceImpl implements GoogleDriverService {
     }
 
     @Override
-    public InputStream exportFileToInputStream(String fileId) throws IOException {
-        return googleDriver.files().export(fileId, GoogleDriverAttributes.PDF_APPLICATION_FILE_TYPE)
-                .executeAsInputStream();
+    public void uploadFileToGoogleDrive(String linkDownload, String name) throws IOException {
+        log.info("start upload file : " + name + " to google drive.");
+        URL url = new URL(linkDownload);
+        try (InputStream inputStream = url.openStream()) {
+
+            File fileMetadata = new File();
+            fileMetadata.setName(name);
+            fileMetadata.setMimeType(GoogleDriverAttributes.PDF_APPLICATION_FILE_TYPE);
+
+            InputStreamContent inputStreamContent = new InputStreamContent(GoogleDriverAttributes.PDF_APPLICATION_FILE_TYPE, inputStream);
+
+            File driveFile = googleDriver.files().create(fileMetadata, inputStreamContent)
+                    .setFields("id").execute();
+
+            log.info("file id : " + driveFile.getId());
+        }
+        log.info("file uploaded...");
     }
 }

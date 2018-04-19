@@ -6,6 +6,7 @@ import vn.smartdev.book.manager.model.FilesDriver;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.util.List;
 
 
@@ -15,5 +16,5 @@ public interface GoogleDriverService {
 
     File createFolder(String name) throws IOException;
 
-    InputStream exportFileToInputStream(String fileId) throws IOException;
+    void uploadFileToGoogleDrive(String linkDownload, String name) throws IOException;
 }

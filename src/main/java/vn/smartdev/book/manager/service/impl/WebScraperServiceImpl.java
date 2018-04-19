@@ -1,6 +1,5 @@
 package vn.smartdev.book.manager.service.impl;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
@@ -20,10 +19,7 @@ import vn.smartdev.book.manager.service.NotificationService;
 import vn.smartdev.book.manager.service.WebScraperService;
 import vn.smartdev.book.manager.utils.AllITBooksAttributes;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Iterator;
 import java.util.Objects;
 
@@ -104,24 +100,15 @@ public class WebScraperServiceImpl implements WebScraperService {
             log.info("information - " + title.text() + " " + value.text());
         }
 
-        log.info("Download link : " + linkDownload);
-
-        String realLink = linkDownload.replaceAll(" ","%20");
-
-        URL url = new URL(realLink);
-
-        try (InputStream inputStream = url.openStream()) {
-            File file = new File("/home/tuanle/Desktop/"+bookName+".pdf");
-            FileUtils.copyInputStreamToFile(inputStream, file);
-        }
-        log.info("file was save success.");
+        googleDriverService.uploadFileToGoogleDrive(linkDownload, bookName);
         return null;
     }
 
     private String getLinkDownloadFromDetailPage(Document detailBookPage) {
         Element downloadLink = detailBookPage.getElementsByClass(AllITBooksAttributes.BOOK_DOWNLOAD_LINK_ELEMENT).first();
+        String link =  downloadLink.select("a").attr("href").toString();
 
-        return downloadLink.select("a").attr("href").toString();
+        return link.replaceAll(" ","%20");
     }
 
     private String getLinkDetail(Element firstBook) {

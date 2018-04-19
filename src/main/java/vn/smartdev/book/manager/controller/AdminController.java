@@ -1,22 +1,19 @@
 package vn.smartdev.book.manager.controller;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import vn.smartdev.book.manager.model.LinkContent;
 import vn.smartdev.book.manager.provider.PropertyProvider;
 
+import java.io.IOException;
 import java.util.List;
 
 @Controller
 public class AdminController {
 
-    static final Log log = LogFactory.getFactory().getInstance(AdminController.class);
-
     @RequestMapping(value = "/admin-console")
-    public String showAdminConsole(ModelMap modelMap){
+    public String showAdminConsole(ModelMap modelMap) throws IOException {
         List<LinkContent> linkContents = PropertyProvider.linkContents;
         modelMap.put("linkContents", linkContents);
         return "admin-console";
