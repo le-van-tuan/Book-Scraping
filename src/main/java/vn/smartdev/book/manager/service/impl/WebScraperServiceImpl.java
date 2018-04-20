@@ -77,6 +77,8 @@ public class WebScraperServiceImpl implements WebScraperService {
             Book book = initBookFromName(firstBook.text());
             BookDetail  bookDetail = getBookDetailFromLink(bookDetailLink, bookName);
 
+
+
             break;
         }
     }

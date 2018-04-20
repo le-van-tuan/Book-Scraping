@@ -1,6 +1,7 @@
 package vn.smartdev.book.manager.service;
 
 import com.google.api.services.drive.model.File;
+import vn.smartdev.book.manager.model.DriveFileType;
 import vn.smartdev.book.manager.model.FilesDriver;
 
 import java.io.IOException;
@@ -14,7 +15,11 @@ public interface GoogleDriverService {
 
     List<FilesDriver> getAllDriverFiles() throws IOException;
 
-    File createFolder(String name) throws IOException;
+    File createFolder(String rootFolderId, String name) throws IOException;
 
     void uploadFileToGoogleDrive(String linkDownload, String name) throws IOException;
+
+    String getDriveFileId(String name, DriveFileType fileType) throws IOException;
+
+    String getRootFolderId() throws IOException;
 }

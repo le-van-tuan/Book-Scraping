@@ -29,6 +29,12 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
+    public BookDetail saveBookDetail(BookDetail bookDetail) {
+        bookDetail.setId(UUID.randomUUID().toString());
+        return bookDetailRepository.save(bookDetail);
+    }
+
+    @Override
     public boolean isBookWithDownloadState(String name, DownloadState downloadState) {
         BookDetail bookDetail = bookDetailRepository.findByBook_NameAndState(name, downloadState);
 

@@ -13,7 +13,7 @@ import java.util.List;
 public class AdminController {
 
     @RequestMapping(value = "/admin-console")
-    public String showAdminConsole(ModelMap modelMap) throws IOException {
+    public String showAdminConsole(ModelMap modelMap) {
         List<LinkContent> linkContents = PropertyProvider.linkContents;
         modelMap.put("linkContents", linkContents);
         return "admin-console";
