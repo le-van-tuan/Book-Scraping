@@ -40,18 +40,11 @@ public class PropertyProvider {
 
             linkContent.setId(UUID.randomUUID().toString());
             linkContent.setLinkUrl(ebl.trim().toString());
-            linkContent.setLinkTitle(getTitleFromLink(ebl.trim().toString()));
+            linkContent.setLinkTitle(ebl.trim().toString());
 
             linkContents.add(linkContent);
         });
         return linkContents;
-    }
-
-    private String getTitleFromLink(String s) {
-        String newLink = s.substring(0, s.length()-1);
-        int lastIndex = newLink.lastIndexOf("/");
-
-        return newLink.substring(lastIndex + 1, newLink.length());
     }
 
     public static LinkContent getLinkContentById(String id) {

@@ -60,12 +60,14 @@ public class GoogleDriverServiceImpl implements GoogleDriverService {
 
     /**
      *
+     * @param rootFolderId
      * @param name
      * @return
      * @throws IOException
      */
     @Override
     public File createFolder(String rootFolderId, String name) throws IOException {
+        log.info("starting to create folder with name : " + name);
         File fileMetadata = new File();
 
         fileMetadata.setName(name);
@@ -77,8 +79,16 @@ public class GoogleDriverServiceImpl implements GoogleDriverService {
                 .execute();
     }
 
+    /**
+     *
+     * @param rootFolderID
+     * @param linkDownload
+     * @param name
+     * @return
+     * @throws IOException
+     */
     @Override
-    public void uploadFileToGoogleDrive(String linkDownload, String name) throws IOException {
+    public File uploadFileToGoogleDrive(String rootFolderID, String linkDownload, String name) throws IOException {
         log.info("start upload file : " + name + " to google drive.");
         URL url = new URL(linkDownload);
         try (InputStream inputStream = url.openStream()) {
@@ -86,17 +96,25 @@ public class GoogleDriverServiceImpl implements GoogleDriverService {
             File fileMetadata = new File();
             fileMetadata.setName(name);
             fileMetadata.setMimeType(GoogleDriverAttributes.PDF_APPLICATION_FILE_TYPE);
+            fileMetadata.setParents(Collections.singletonList(rootFolderID));
 
             InputStreamContent inputStreamContent = new InputStreamContent(GoogleDriverAttributes.PDF_APPLICATION_FILE_TYPE, inputStream);
 
             File driveFile = googleDriver.files().create(fileMetadata, inputStreamContent)
                     .setFields("id").execute();
 
-            log.info("file id : " + driveFile.getId());
+            log.info("Uploaded book with name : " +  name);
+            return driveFile;
         }
-        log.info("file uploaded...");
     }
 
+    /**
+     *
+     * @param name
+     * @param fileType
+     * @return
+     * @throws IOException
+     */
     @Override
     public String getDriveFileId(String name, DriveFileType fileType) throws IOException {
         String fileMineType = trackMineType(fileType);
@@ -116,9 +134,26 @@ public class GoogleDriverServiceImpl implements GoogleDriverService {
         return null;
     }
 
+    /**
+     *
+     * @return
+     * @throws IOException
+     */
     @Override
     public String getRootFolderId() throws IOException {
         return this.getDriveFileId(ROOT_FOLDER, DriveFileType.FOLDER);
+    }
+
+    /**
+     *
+     * @param name
+     * @return
+     * @throws IOException
+     */
+    @Override
+    public File createFolderIntoRootFolder(String name) throws IOException {
+        String rootFolderId = this.getRootFolderId();
+        return this.createFolder(rootFolderId, name);
     }
 
     private String trackMineType(DriveFileType fileType) {

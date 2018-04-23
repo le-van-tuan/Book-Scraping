@@ -35,11 +35,18 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
-    public boolean isBookWithDownloadState(String name, DownloadState downloadState) {
-        BookDetail bookDetail = bookDetailRepository.findByBook_NameAndState(name, downloadState);
+    public boolean isBookWasDownload(String name) {
+        BookDetail bookDetail = bookDetailRepository.findByBook_NameAndState(name, DownloadState.COMPLETED);
+        return !Objects.isNull(bookDetail);
+    }
 
-        if(!Objects.isNull(bookDetail)) return true;
+    @Override
+    public Book updateBook(Book book) {
+        return bookRepository.save(book);
+    }
 
-        return false;
+    @Override
+    public BookDetail updateBookDetail(BookDetail bookDetail) {
+        return bookDetailRepository.save(bookDetail);
     }
 }

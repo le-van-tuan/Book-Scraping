@@ -17,9 +17,11 @@ public interface GoogleDriverService {
 
     File createFolder(String rootFolderId, String name) throws IOException;
 
-    void uploadFileToGoogleDrive(String linkDownload, String name) throws IOException;
+    File uploadFileToGoogleDrive(String rootFolderID, String linkDownload, String name) throws IOException;
 
     String getDriveFileId(String name, DriveFileType fileType) throws IOException;
 
     String getRootFolderId() throws IOException;
+
+    File createFolderIntoRootFolder(String name) throws IOException;
 }

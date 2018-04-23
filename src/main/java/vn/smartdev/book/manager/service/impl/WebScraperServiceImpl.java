@@ -11,6 +11,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 import vn.smartdev.book.manager.entity.Book;
 import vn.smartdev.book.manager.entity.BookDetail;
+import vn.smartdev.book.manager.entity.DownloadState;
 import vn.smartdev.book.manager.model.LinkContent;
 import vn.smartdev.book.manager.provider.PropertyProvider;
 import vn.smartdev.book.manager.service.BookService;
@@ -40,6 +41,10 @@ public class WebScraperServiceImpl implements WebScraperService {
     @Autowired
     private BookService bookService;
 
+    /**
+     *
+     * @param linkContent
+     */
     @Override
     public void scrapBookFromUrl(LinkContent linkContent){
         if(!Objects.isNull(linkContent)){
@@ -48,9 +53,12 @@ public class WebScraperServiceImpl implements WebScraperService {
                 try {
                     log.info("Thread in : " + linkContent.getLinkUrl() + " is running..");
                     openMainCategoryPage(linkContent);
+                    log.info("save all book success with link : " + linkContent.getLinkUrl());
+                    notificationService.pushNotify(linkContent.getLinkUrl(), null);
                 } catch (IOException e) {
                     log.error(e.getMessage());
                     e.printStackTrace();
+                    notificationService.pushNotify(linkContent.getLinkUrl(), e.getMessage());
                 }
             });
         }
@@ -58,32 +66,46 @@ public class WebScraperServiceImpl implements WebScraperService {
 
     private void openMainCategoryPage(LinkContent linkContent) throws IOException {
         int limitQuantityBook = PropertyProvider.limitBookQuantityPerCategory;
+        int currentBookDownloaded = 0;
 
         Document mainCategoryPage = Jsoup.connect(linkContent.getLinkUrl()).get();
+        Elements allBookAtFirstPage = mainCategoryPage.getElementsByClass(AllITBooksAttributes.BOOK_TITLE_ELEMENT);
 
-        for (int i = 0 ; i < limitQuantityBook ; i ++){
-            Elements allBookAtFirstPage = mainCategoryPage.getElementsByClass(AllITBooksAttributes.BOOK_TITLE_ELEMENT);
+        if(!allBookAtFirstPage.isEmpty()){
+            for (int i = 0 ; i < allBookAtFirstPage.size() ; i ++){
+                if(currentBookDownloaded <= limitQuantityBook){
+                    Element bookElement = allBookAtFirstPage.get(i);
 
-            Element firstBook = allBookAtFirstPage.first();
+                    String bookDetailLink = getLinkDetail(bookElement);
+                    String bookName = bookElement.text();
 
-            String bookDetailLink = getLinkDetail(firstBook);
-            String bookName = firstBook.text();
+                    log.info("book name : " + bookName);
+                    log.info("detail book link : " + bookDetailLink);
 
-            log.info("book name : " + bookName);
-            log.info("detail book link : " + bookDetailLink);
+                    if(!bookService.isBookWasDownload(bookName)){
+                        Book book = initBookFromName(bookName);
+                        BookDetail  bookDetail = getBookDetailFromLink(bookDetailLink, bookName);
 
-
-
-            Book book = initBookFromName(firstBook.text());
-            BookDetail  bookDetail = getBookDetailFromLink(bookDetailLink, bookName);
-
-
-
-            break;
+                        saveBookToDB(book, bookDetail);
+                        currentBookDownloaded += 1;
+                    }
+                }else if(currentBookDownloaded == limitQuantityBook){
+                    break;
+                }
+            }
         }
     }
 
+    private void saveBookToDB(Book book, BookDetail bookDetail) {
+        Book bookSaved = bookService.saveBook(book);
+
+        bookDetail.setBook(bookSaved);
+        bookService.saveBookDetail(bookDetail);
+    }
+
     private BookDetail getBookDetailFromLink(String bookDetailLink, String bookName) throws IOException {
+        BookDetail bookDetail = new BookDetail();
+
         Document detailBookPage = Jsoup.connect(bookDetailLink).get();
 
         String linkDownload = getLinkDownloadFromDetailPage(detailBookPage);
@@ -101,9 +123,26 @@ public class WebScraperServiceImpl implements WebScraperService {
 
             log.info("information - " + title.text() + " " + value.text());
         }
+        try{
 
-        googleDriverService.uploadFileToGoogleDrive(linkDownload, bookName);
-        return null;
+            // TODO : need to check that category already exist ?
+            // TODO : pass root folder id to parameter
+            // TODO : save book to db with sate is completed
+            googleDriverService.uploadFileToGoogleDrive("a", linkDownload, bookName);
+            bookDetail = wrappingBookDetail(bookDetail);
+        }catch (IOException e){
+            log.info("There is an error while try to upload book to gg drive : " + e.getMessage());
+            e.printStackTrace();
+            bookDetail.setState(DownloadState.FAILED);
+        }
+        return bookDetail;
+    }
+
+    private BookDetail wrappingBookDetail(BookDetail bookDetail) {
+        bookDetail.setState(DownloadState.COMPLETED);
+
+
+        return bookDetail;
     }
 
     private String getLinkDownloadFromDetailPage(Document detailBookPage) {
