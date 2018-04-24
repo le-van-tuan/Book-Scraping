@@ -7,6 +7,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import vn.smartdev.book.manager.service.NotificationService;
 
+import java.util.Objects;
+
 @Service
 public class NotificationServiceImpl implements NotificationService {
 
@@ -28,10 +30,10 @@ public class NotificationServiceImpl implements NotificationService {
         message.setTo(receiver);
         message.setSubject(subject);
 
-        if(error == null){
+        if(Objects.isNull(error)){
          message.setText("All IT book in link " + subject + " was downloaded success.");
         }else{
-            message.setText("There was an error while try to download IT book from link : " + subject + " , detail reason : " + error);
+            message.setText("There was an error while trying to download IT book from link : " + subject + " , detail reason : " + error);
         }
 
         javaMailSender.send(message);

@@ -65,11 +65,16 @@ public class WebScraperServiceImpl implements WebScraperService {
     }
 
     private void openMainCategoryPage(LinkContent linkContent) throws IOException {
+        int currentPage = 1;
         int limitQuantityBook = PropertyProvider.limitBookQuantityPerCategory;
         int currentBookDownloaded = 0;
 
         Document mainCategoryPage = Jsoup.connect(linkContent.getLinkUrl()).get();
         Elements allBookAtFirstPage = mainCategoryPage.getElementsByClass(AllITBooksAttributes.BOOK_TITLE_ELEMENT);
+
+       while (allBookAtFirstPage.size() < limitQuantityBook){
+           mainCategoryPage = Jsoup.connect(getNextPage(currentPage, linkContent.getLinkUrl(), mainCategoryPage)).get();
+       }
 
         if(!allBookAtFirstPage.isEmpty()){
             for (int i = 0 ; i < allBookAtFirstPage.size() ; i ++){
@@ -89,11 +94,18 @@ public class WebScraperServiceImpl implements WebScraperService {
                         saveBookToDB(book, bookDetail);
                         currentBookDownloaded += 1;
                     }
-                }else if(currentBookDownloaded == limitQuantityBook){
+                }
+                if(currentBookDownloaded == limitQuantityBook){
                     break;
                 }
             }
         }
+    }
+
+    private String getNextPage(int currentPage, String linkUrl, Document mainCategoryPage) {
+        Elements nextPageElements = mainCategoryPage.getElementsByClass(AllITBooksAttributes.NEXT_PAGE_ELEMENT);
+
+        return null;
     }
 
     private void saveBookToDB(Book book, BookDetail bookDetail) {
