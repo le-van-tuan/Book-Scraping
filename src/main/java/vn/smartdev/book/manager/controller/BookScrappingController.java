@@ -25,7 +25,7 @@ public class BookScrappingController {
         LinkContent linkContent = PropertyProvider.getLinkContentById(id);
         log.info("downloading book from url :" + linkContent.getLinkUrl());
 
-//        webScraperService.scrapBookFromUrl(linkContent);
+        webScraperService.scrapBookFromUrl(linkContent);
     }
 
     @RequestMapping(value = "/init-data", method = RequestMethod.GET)

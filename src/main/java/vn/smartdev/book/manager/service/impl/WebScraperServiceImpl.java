@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import vn.smartdev.book.manager.entity.Book;
 import vn.smartdev.book.manager.entity.BookDetail;
 import vn.smartdev.book.manager.entity.DownloadState;
+import vn.smartdev.book.manager.entity.builder.BookDetailBuilder;
+import vn.smartdev.book.manager.model.DriveFileType;
 import vn.smartdev.book.manager.model.LinkContent;
 import vn.smartdev.book.manager.provider.PropertyProvider;
 import vn.smartdev.book.manager.service.BookService;
@@ -48,13 +50,13 @@ public class WebScraperServiceImpl implements WebScraperService {
     @Override
     public void scrapBookFromUrl(LinkContent linkContent){
         if(!Objects.isNull(linkContent)){
-            log.info("Start scrapping boot from url : " + linkContent.getLinkUrl());
+            log.info("Start scrapping books from url : " + linkContent.getLinkUrl());
             taskExecutor.execute(() -> {
                 try {
                     log.info("Thread in : " + linkContent.getLinkUrl() + " is running..");
                     openMainCategoryPage(linkContent);
                     log.info("save all book success with link : " + linkContent.getLinkUrl());
-//                    notificationService.pushNotify(linkContent.getLinkUrl(), null);
+                    notificationService.pushNotify(linkContent.getLinkUrl(), null);
                 } catch (IOException e) {
                     log.error(e.getMessage());
                     e.printStackTrace();
@@ -68,32 +70,50 @@ public class WebScraperServiceImpl implements WebScraperService {
         Elements allITBooks = getAllITBookElements(linkContent);
 
         if(!allITBooks.isEmpty()){
-            allITBooks.stream().forEach(aib ->{
-                Element bookElement = aib;
-
+            for (Element bookElement : allITBooks) {
                 String bookDetailLink = getLinkDetail(bookElement);
                 String bookName = bookElement.text();
 
-                log.info("book name : " + bookName);
-                log.info("detail book link : " + bookDetailLink);
-
-                if(!bookService.isBookWasDownload(bookName)){
+                if (!bookService.isBookWasDownload(bookName)) {
                     Book book = initBookFromName(bookName);
-                    BookDetail  bookDetail = null;
+                    BookDetail bookDetail;
                     try {
-                        bookDetail = getBookDetailFromLink(bookDetailLink, bookName);
+                        bookDetail = getBookDetailFromLink(book, bookDetailLink);
+
+                        uploadBookToGoogleDrive(bookDetail);
+
+                        bookDetail.setState(DownloadState.COMPLETED);
+                        bookService.saveBookDetail(bookDetail);
                     } catch (IOException e) {
+                        log.info("Occur some error while try do download book name : " + bookName);
+                        e.printStackTrace();
+                        log.info("Reason : " + e.getMessage());
+                        bookDetail = new BookDetail();
 
+                        bookDetail.setState(DownloadState.FAILED);
+                        bookDetail.setBook(book);
 
+                        bookService.saveBookDetail(bookDetail);
                     }
-
-                    saveBookToDB(book, bookDetail);
                 }
-            });
+                break;
+            }
         }
     }
 
+    private void uploadBookToGoogleDrive(BookDetail bookDetail) throws IOException {
+        String categoryFolderId;
+
+        if(!googleDriverService.isFolderNameExistInRootFolder(bookDetail.getCategory())){
+            categoryFolderId = googleDriverService.createFolderIntoRootFolder(bookDetail.getCategory()).getId();
+        }else{
+            categoryFolderId = googleDriverService.getDriveFileId(bookDetail.getCategory(), DriveFileType.FOLDER);
+        }
+        googleDriverService.uploadFileToGoogleDrive(categoryFolderId, bookDetail.getLinkDownload(), bookDetail.getBook().getName());
+    }
+
     private Elements getAllITBookElements(LinkContent linkContent) throws IOException {
+        log.info("Starting to get all book element for the required.");
         int currentPage = 1;
         int limitQuantityBook = PropertyProvider.limitBookQuantityPerCategory;
 
@@ -125,6 +145,7 @@ public class WebScraperServiceImpl implements WebScraperService {
     }
 
     private String getNextUrlPage(int currentPage, Document mainCategoryPage) {
+        log.info("Starting to get next page : " + currentPage + 1);
         Elements nextPageElements = mainCategoryPage.getElementsByClass(AllITBooksAttributes.NEXT_PAGE_ELEMENT);
 
         if(nextPageElements.isEmpty()) return null;
@@ -138,64 +159,97 @@ public class WebScraperServiceImpl implements WebScraperService {
         return null;
     }
 
-    private void saveBookToDB(Book book, BookDetail bookDetail) {
-        Book bookSaved = bookService.saveBook(book);
-
-        bookDetail.setBook(bookSaved);
-        bookService.saveBookDetail(bookDetail);
-    }
-
-    private BookDetail getBookDetailFromLink(String bookDetailLink, String bookName) throws IOException {
-        BookDetail bookDetail = new BookDetail();
+    private BookDetail getBookDetailFromLink(Book book, String bookDetailLink) throws IOException {
+        BookDetail bookDetail;
 
         Document detailBookPage = Jsoup.connect(bookDetailLink).get();
 
         String linkDownload = getLinkDownloadFromDetailPage(detailBookPage);
+        String linkCoverImage = getLinkCoverImageFromDetailPage(detailBookPage);
+        String bookDescription = getBookDescription(detailBookPage);
+        String author = null;
+        String year = null;
+        String pages = null;
+        String languages = null;
+        String fileSize = null;
+        String fileFormat = null;
+        String category = null;
 
         Element bookDetailParent = detailBookPage.getElementsByClass(AllITBooksAttributes.BOOK_DETAIL_ELEMENT).first();
-
         Element bookDetailChild = bookDetailParent.select("dl").first();
 
-        Iterator<Element> titleInformation = bookDetailChild.select("dt").iterator();
-        Iterator<Element> valueInformation = bookDetailChild.select("dd").iterator();
+        Elements titleInformation = bookDetailChild.select("dt");
+        Elements valueInformation = bookDetailChild.select("dd");
 
-        while (titleInformation.hasNext()){
-            Element title = titleInformation.next();
-            Element value = valueInformation.next();
+        for(int i = 0 ; i < titleInformation.size() ; i ++){
+            Element title = titleInformation.get(i);
 
-            log.info("information - " + title.text() + " " + value.text());
+            if(title.text().equalsIgnoreCase(AllITBooksAttributes.AUTHOR_TITLE)){
+                author = valueInformation.get(i).text();
+            }else if(title.text().equalsIgnoreCase(AllITBooksAttributes.YEAR_TITLE)){
+                year = valueInformation.get(i).text();
+            }else if(title.text().equalsIgnoreCase(AllITBooksAttributes.PAGES_TITLE)){
+                pages = valueInformation.get(i).text();
+            }else if(title.text().equalsIgnoreCase(AllITBooksAttributes.LANGUAGES_TITLE)){
+                languages = valueInformation.get(i).text();
+            }else if(title.text().equalsIgnoreCase(AllITBooksAttributes.FILE_SIZE_TITLE)){
+                fileSize = valueInformation.get(i).text();
+            }else if(title.text().equalsIgnoreCase(AllITBooksAttributes.FILE_FORMAT_TITLE)){
+                fileFormat = valueInformation.get(i).text();
+            }else if(title.text().equalsIgnoreCase(AllITBooksAttributes.CATEGORY_TITLE)){
+                category = valueInformation.get(i).text();
+            }
         }
-        try{
-
-            // TODO : need to check that category already exist ?
-            // TODO : pass root folder id to parameter
-            // TODO : save book to db with sate is completed
-            googleDriverService.uploadFileToGoogleDrive("a", linkDownload, bookName);
-            bookDetail = wrappingBookDetail(bookDetail);
-        }catch (IOException e){
-            log.info("There is an error while try to upload book to gg drive : " + e.getMessage());
-            e.printStackTrace();
-            bookDetail.setState(DownloadState.FAILED);
-        }
+        bookDetail = wrappingBookDetail(book, linkDownload, linkCoverImage, author, year, pages, languages, fileSize, fileFormat, category, bookDescription);
         return bookDetail;
     }
 
-    private BookDetail wrappingBookDetail(BookDetail bookDetail) {
-        bookDetail.setState(DownloadState.COMPLETED);
+    private BookDetail wrappingBookDetail(Book book, String linkDownload, String linkCoverImage, String author, String year, String pages, String languages, String fileSize, String fileFormat, String category, String bookDescription) {
+        return BookDetailBuilder.aBookDetail()
+                .withLinkDownload(linkDownload)
+                .withImage(linkCoverImage)
+                .withAuthor(author)
+                .withPublicationDate(year)
+                .withPages(Integer.valueOf(pages))
+                .withLanguages(languages)
+                .withFileSize(fileSize)
+                .withFileFormat(fileFormat)
+                .withCategory(category)
+                .withBookDescription(bookDescription)
+                .withState(DownloadState.NONE)
+                .withBook(book)
+                .build();
+    }
 
+    private String getBookDescription(Document detailBookPage) {
+        StringBuilder bookDescription = new StringBuilder();
 
-        return bookDetail;
+        Element coverImageElement = detailBookPage.getElementsByClass(AllITBooksAttributes.BOOK_DESCRIPTION_ENTRY).first();
+
+        Elements contents = coverImageElement.select("p");
+
+        contents.stream().forEach(ct->{
+            bookDescription.append(ct.text());
+            bookDescription.append("\n");
+        });
+        return bookDescription.toString();
+    }
+
+    private String getLinkCoverImageFromDetailPage(Document detailBookPage) {
+        Element coverImageElement = detailBookPage.getElementsByClass(AllITBooksAttributes.COVER_IMAGE_TITLE).first();
+
+        return coverImageElement.select("img").attr("src");
     }
 
     private String getLinkDownloadFromDetailPage(Document detailBookPage) {
         Element downloadLink = detailBookPage.getElementsByClass(AllITBooksAttributes.BOOK_DOWNLOAD_LINK_ELEMENT).first();
-        String link =  downloadLink.select("a").attr("href").toString();
+        String link =  downloadLink.select("a").attr("href");
 
         return link.replaceAll(" ","%20");
     }
 
     private String getLinkDetail(Element firstBook) {
-        return firstBook.select("a").attr("href").toString();
+        return firstBook.select("a").attr("href");
     }
 
     private Book initBookFromName(String text) {
@@ -203,6 +257,6 @@ public class WebScraperServiceImpl implements WebScraperService {
 
         book.setName(text);
 
-        return book;
+        return bookService.saveBook(book);
     }
 }

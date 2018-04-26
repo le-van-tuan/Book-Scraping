@@ -5,7 +5,7 @@ bookScrappingApp.factory('BookScrappingService', ['$http', '$q', function ($http
 
     var factory = {
         downloadBook:downloadBook,
-        setupData:initData
+        initData:initData
     };
     return factory;
 
@@ -22,15 +22,15 @@ bookScrappingApp.factory('BookScrappingService', ['$http', '$q', function ($http
 
     function initData() {
         console.log('initialize data...');
-        // var deferred = $q.defer();
-        // $http.get(INIT_DATA)
-        //     .then(function (value) {
-        //             deferred.resolve(value.data);
-        //         },
-        //         function (reason) {
-        //             deferred.reject(reason);
-        //         }
-        //     );
-        // return deferred.promise;
+        var deferred = $q.defer();
+        $http.get(INIT_DATA)
+            .then(function (value) {
+                    deferred.resolve(value.data);
+                },
+                function (reason) {
+                    deferred.reject(reason);
+                }
+            );
+        return deferred.promise;
     }
 }]);

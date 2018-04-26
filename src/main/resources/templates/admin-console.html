@@ -15,16 +15,27 @@
 </head>
 <body style="background: transparent;" ng-app="bookScrappingModule" ng-controller="BookScrappingController as ctrl">
 <center>
-    <h5 style="color: #31a5ce; font-weight: 700; font-size: 35px; position: relative;">Welcome to Book-Scrapping admin console</h5>
-    <button ng-click="ctrl.initData()">a</button>
+    <h4 style="color: #31a5ce; font-weight: 700; font-size: 35px; position: relative;">Welcome to Book-Scrapping admin console</h4>
 </center>
-<center ng-repeat="lc in ctrl.linkContents">
-    <div class="row" style="padding-top: 30px;">
-        <div class="col-sm-3">
-            <button type="button" class="btn btn-success" ng-disabled="{{lc.isSubmit}}" ng-click="ctrl.submit(lc.id)" ng-bind="lc.linkContents"></button>
-            <p style="color: #fa8021">is submit : <b>{{lc.isSubmit}}</b></p>
-        </div>
-    </div>
+<center>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Index</th>
+            <th>Link URL</th>
+            <th>Button</th>
+            <th>Is Downloading</th>
+        </tr>
+        </thead>
+        <tbody ng-repeat="lc in ctrl.linkContents">
+        <tr class="success">
+            <td>{{$index + 1}}</td>
+            <td>{{lc.linkUrl}}</td>
+            <td><button type="button" class="btn btn-danger" ng-disabled="lc.submit" ng-click="ctrl.submit(lc.id)">{{lc.linkUrl}}</button></td>
+            <td><b style="color: #190903">{{lc.submit}}</b></td>
+        </tr>
+        </tbody>
+    </table>
 </center>
 </body>
 </html>

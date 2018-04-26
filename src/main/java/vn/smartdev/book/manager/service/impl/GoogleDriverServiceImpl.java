@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class GoogleDriverServiceImpl implements GoogleDriverService {
@@ -125,7 +126,6 @@ public class GoogleDriverServiceImpl implements GoogleDriverService {
                 .setFields("files(id, name)")
                 .execute();
 
-
         for (File file : result.getFiles()) {
             if(file.getName().equals(name)){
                 return file.getId();
@@ -154,6 +154,16 @@ public class GoogleDriverServiceImpl implements GoogleDriverService {
     public File createFolderIntoRootFolder(String name) throws IOException {
         String rootFolderId = this.getRootFolderId();
         return this.createFolder(rootFolderId, name);
+    }
+
+    @Override
+    public boolean isFolderNameExistInRootFolder(String folderName) throws IOException {
+        String driveFileID = this.getDriveFileId(folderName, DriveFileType.FOLDER);
+
+        if(Objects.isNull(driveFileID)){
+            return false;
+        }
+        return true;
     }
 
     private String trackMineType(DriveFileType fileType) {

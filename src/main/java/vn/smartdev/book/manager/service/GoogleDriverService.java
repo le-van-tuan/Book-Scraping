@@ -24,4 +24,6 @@ public interface GoogleDriverService {
     String getRootFolderId() throws IOException;
 
     File createFolderIntoRootFolder(String name) throws IOException;
+
+    boolean isFolderNameExistInRootFolder(String folderName) throws IOException;
 }

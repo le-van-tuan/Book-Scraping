@@ -4,20 +4,21 @@ bookScrappingApp.controller('BookScrappingController', ['$scope', 'BookScrapping
     var self = this;
 
     self.linkContents = [];
-    self.linkContent = {id : null, linkTitle : '', linkUrl : '', isSubmit : false};
 
     self.downloadBook = downloadBook;
     self.submit = submit;
 
-    self.initData =  initData;
+    initData();
 
     function initData() {
-        BookScrappingService.setupData();
-            // .then(function (value) {
-            //     self.linkContents  = value;
-            // }, function (reason) {
-            //     console.error(reason);
-            // });
+        console.info('I am came here to love you babe.');
+        BookScrappingService.initData()
+            .then(function (value) {
+                 self.linkContents = value;
+            },
+                function (reason) {
+                console.info('error : '  + reason);
+            });
     }
 
     function downloadBook(id) {
@@ -26,11 +27,12 @@ bookScrappingApp.controller('BookScrappingController', ['$scope', 'BookScrapping
     }
 
     function submit(id) {
-        for(var i = 0; i < self.linkContents.length;i++){
+        for(var i = 0; i < self.linkContents.length; i++){
             if(self.linkContents[i].id === id){
-                self.linkContents[i].isSubmit = true;
+                self.linkContents[i].submit = true;
                 break;
             }
         }
+        downloadBook(id);
     }
 }]);
