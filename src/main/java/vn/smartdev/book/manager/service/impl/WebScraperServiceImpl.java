@@ -54,7 +54,7 @@ public class WebScraperServiceImpl implements WebScraperService {
                     log.info("Thread in : " + linkContent.getLinkUrl() + " is running..");
                     openMainCategoryPage(linkContent);
                     log.info("save all book success with link : " + linkContent.getLinkUrl());
-                    notificationService.pushNotify(linkContent.getLinkUrl(), null);
+//                    notificationService.pushNotify(linkContent.getLinkUrl(), null);
                 } catch (IOException e) {
                     log.error(e.getMessage());
                     e.printStackTrace();
@@ -65,46 +65,76 @@ public class WebScraperServiceImpl implements WebScraperService {
     }
 
     private void openMainCategoryPage(LinkContent linkContent) throws IOException {
-        int currentPage = 1;
-        int limitQuantityBook = PropertyProvider.limitBookQuantityPerCategory;
-        int currentBookDownloaded = 0;
+        Elements allITBooks = getAllITBookElements(linkContent);
 
-        Document mainCategoryPage = Jsoup.connect(linkContent.getLinkUrl()).get();
-        Elements allBookAtFirstPage = mainCategoryPage.getElementsByClass(AllITBooksAttributes.BOOK_TITLE_ELEMENT);
+        if(!allITBooks.isEmpty()){
+            allITBooks.stream().forEach(aib ->{
+                Element bookElement = aib;
 
-       while (allBookAtFirstPage.size() < limitQuantityBook){
-           mainCategoryPage = Jsoup.connect(getNextPage(currentPage, linkContent.getLinkUrl(), mainCategoryPage)).get();
-       }
+                String bookDetailLink = getLinkDetail(bookElement);
+                String bookName = bookElement.text();
 
-        if(!allBookAtFirstPage.isEmpty()){
-            for (int i = 0 ; i < allBookAtFirstPage.size() ; i ++){
-                if(currentBookDownloaded <= limitQuantityBook){
-                    Element bookElement = allBookAtFirstPage.get(i);
+                log.info("book name : " + bookName);
+                log.info("detail book link : " + bookDetailLink);
 
-                    String bookDetailLink = getLinkDetail(bookElement);
-                    String bookName = bookElement.text();
+                if(!bookService.isBookWasDownload(bookName)){
+                    Book book = initBookFromName(bookName);
+                    BookDetail  bookDetail = null;
+                    try {
+                        bookDetail = getBookDetailFromLink(bookDetailLink, bookName);
+                    } catch (IOException e) {
 
-                    log.info("book name : " + bookName);
-                    log.info("detail book link : " + bookDetailLink);
 
-                    if(!bookService.isBookWasDownload(bookName)){
-                        Book book = initBookFromName(bookName);
-                        BookDetail  bookDetail = getBookDetailFromLink(bookDetailLink, bookName);
-
-                        saveBookToDB(book, bookDetail);
-                        currentBookDownloaded += 1;
                     }
+
+                    saveBookToDB(book, bookDetail);
                 }
-                if(currentBookDownloaded == limitQuantityBook){
-                    break;
-                }
-            }
+            });
         }
     }
 
-    private String getNextPage(int currentPage, String linkUrl, Document mainCategoryPage) {
+    private Elements getAllITBookElements(LinkContent linkContent) throws IOException {
+        int currentPage = 1;
+        int limitQuantityBook = PropertyProvider.limitBookQuantityPerCategory;
+
+        Document mainCategoryPage = Jsoup.connect(linkContent.getLinkUrl()).get();
+
+        Elements allITBooks = mainCategoryPage.getElementsByClass(AllITBooksAttributes.BOOK_TITLE_ELEMENT);
+
+        if(!allITBooks.isEmpty()){
+            while (allITBooks.size() < limitQuantityBook){
+                String nextPage = getNextUrlPage(currentPage, mainCategoryPage);
+
+                if(Objects.isNull(nextPage)){
+                    break;
+                } else {
+                    mainCategoryPage = Jsoup.connect(nextPage).get();
+                    Elements newPage = mainCategoryPage.getElementsByClass(AllITBooksAttributes.BOOK_TITLE_ELEMENT);
+
+                    for (Element np : newPage) {
+                        if (allITBooks.size() == limitQuantityBook) {
+                            break;
+                        }
+                        allITBooks.add(np);
+                    }
+                    currentPage += 1;
+                }
+            }
+        }
+        return allITBooks;
+    }
+
+    private String getNextUrlPage(int currentPage, Document mainCategoryPage) {
         Elements nextPageElements = mainCategoryPage.getElementsByClass(AllITBooksAttributes.NEXT_PAGE_ELEMENT);
 
+        if(nextPageElements.isEmpty()) return null;
+
+        Elements pages = nextPageElements.select("a");
+        for(Element page : pages){
+            if(page.text().equals(String.valueOf(currentPage + 1))){
+                return page.attr("href");
+            }
+        }
         return null;
     }
 
