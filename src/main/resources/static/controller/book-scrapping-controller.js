@@ -3,16 +3,34 @@ bookScrappingApp.controller('BookScrappingController', ['$scope', 'BookScrapping
 
     var self = this;
 
-    /*Download status*/
-    self.waiting = "waiting";
-    self.loading = "loading";
-    self.error = 'error';
-    self.done = 'done';
+    self.linkContents = [];
+    self.linkContent = {id : null, linkTitle : '', linkUrl : '', isSubmit : false};
 
     self.downloadBook = downloadBook;
+    self.submit = submit;
+
+    self.initData =  initData;
+
+    function initData() {
+        BookScrappingService.setupData();
+            // .then(function (value) {
+            //     self.linkContents  = value;
+            // }, function (reason) {
+            //     console.error(reason);
+            // });
+    }
 
     function downloadBook(id) {
         console.info('Start download book on link : ' + id);
         BookScrappingService.downloadBook(id);
+    }
+
+    function submit(id) {
+        for(var i = 0; i < self.linkContents.length;i++){
+            if(self.linkContents[i].id === id){
+                self.linkContents[i].isSubmit = true;
+                break;
+            }
+        }
     }
 }]);

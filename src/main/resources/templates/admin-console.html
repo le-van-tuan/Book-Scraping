@@ -16,12 +16,13 @@
 <body style="background: transparent;" ng-app="bookScrappingModule" ng-controller="BookScrappingController as ctrl">
 <center>
     <h5 style="color: #31a5ce; font-weight: 700; font-size: 35px; position: relative;">Welcome to Book-Scrapping admin console</h5>
+    <button ng-click="ctrl.initData()">a</button>
 </center>
-<center th:each="linkContent : ${linkContents}">
+<center ng-repeat="lc in ctrl.linkContents">
     <div class="row" style="padding-top: 30px;">
         <div class="col-sm-3">
-            <button type="button" class="btn btn-success" th:attr="ng-click='ctrl.downloadBook(\''+${linkContent.id}+'\')'" th:text="${linkContent.linkTitle}"></button>
-            <b style="color: #ff6936; padding-left: 15px;">status : {{ctrl.waiting}}</b>
+            <button type="button" class="btn btn-success" ng-disabled="{{lc.isSubmit}}" ng-click="ctrl.submit(lc.id)" ng-bind="lc.linkContents"></button>
+            <p style="color: #fa8021">is submit : <b>{{lc.isSubmit}}</b></p>
         </div>
     </div>
 </center>

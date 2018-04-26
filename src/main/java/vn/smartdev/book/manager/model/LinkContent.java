@@ -10,6 +10,8 @@ public class LinkContent implements Serializable {
 
     private String linkUrl;
 
+    private boolean isSubmit;
+
     public String getLinkTitle() {
         return linkTitle;
     }
@@ -41,5 +43,13 @@ public class LinkContent implements Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public boolean isSubmit() {
+        return isSubmit;
+    }
+
+    public void setSubmit(boolean submit) {
+        isSubmit = submit;
     }
 }

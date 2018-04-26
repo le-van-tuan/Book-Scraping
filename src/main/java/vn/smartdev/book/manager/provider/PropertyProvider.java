@@ -41,6 +41,7 @@ public class PropertyProvider {
             linkContent.setId(UUID.randomUUID().toString());
             linkContent.setLinkUrl(ebl.trim().toString());
             linkContent.setLinkTitle(ebl.trim().toString());
+            linkContent.setSubmit(false);
 
             linkContents.add(linkContent);
         });
@@ -53,7 +54,7 @@ public class PropertyProvider {
         }catch (Exception e){
             log.error(e.getMessage());
             e.printStackTrace();
-            return null;
         }
+        return null;
     }
 }
