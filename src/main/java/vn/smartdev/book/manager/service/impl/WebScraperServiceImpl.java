@@ -1,5 +1,6 @@
 package vn.smartdev.book.manager.service.impl;
 
+import com.google.api.services.drive.model.File;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
@@ -23,7 +24,6 @@ import vn.smartdev.book.manager.service.WebScraperService;
 import vn.smartdev.book.manager.utils.AllITBooksAttributes;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Objects;
 
 @Service
@@ -80,9 +80,12 @@ public class WebScraperServiceImpl implements WebScraperService {
                     try {
                         bookDetail = getBookDetailFromLink(book, bookDetailLink);
 
-                        uploadBookToGoogleDrive(bookDetail);
+                        File file = uploadBookToGoogleDrive(bookDetail);
 
                         bookDetail.setState(DownloadState.COMPLETED);
+                        bookDetail.setDriveFileId(file.getId());
+                        bookDetail.setDriveFileName(file.getName());
+
                         bookService.saveBookDetail(bookDetail);
                     } catch (IOException e) {
                         log.info("Occur some error while try do download book name : " + bookName);
@@ -96,12 +99,11 @@ public class WebScraperServiceImpl implements WebScraperService {
                         bookService.saveBookDetail(bookDetail);
                     }
                 }
-                break;
             }
         }
     }
 
-    private void uploadBookToGoogleDrive(BookDetail bookDetail) throws IOException {
+    private File uploadBookToGoogleDrive(BookDetail bookDetail) throws IOException {
         String categoryFolderId;
 
         if(!googleDriverService.isFolderNameExistInRootFolder(bookDetail.getCategory())){
@@ -109,7 +111,7 @@ public class WebScraperServiceImpl implements WebScraperService {
         }else{
             categoryFolderId = googleDriverService.getDriveFileId(bookDetail.getCategory(), DriveFileType.FOLDER);
         }
-        googleDriverService.uploadFileToGoogleDrive(categoryFolderId, bookDetail.getLinkDownload(), bookDetail.getBook().getName());
+        return googleDriverService.uploadFileToGoogleDrive(categoryFolderId, bookDetail.getLinkDownload(), bookDetail.getBook().getName());
     }
 
     private Elements getAllITBookElements(LinkContent linkContent) throws IOException {

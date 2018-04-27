@@ -46,6 +46,12 @@ public class BookDetail extends BaseEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private DownloadState state;
 
+    @Column(name = "drive_file_id")
+    private String driveFileId;
+
+    @Column(name = "drive_file_name")
+    private String driveFileName;
+
     @OneToOne(fetch = FetchType.LAZY, targetEntity = Book.class)
     @JoinColumn(name = "book_reference_id", nullable = false)
     private Book book;
@@ -152,6 +158,22 @@ public class BookDetail extends BaseEntity implements Serializable {
 
     public void setState(DownloadState state) {
         this.state = state;
+    }
+
+    public String getDriveFileId() {
+        return driveFileId;
+    }
+
+    public void setDriveFileId(String driveFileId) {
+        this.driveFileId = driveFileId;
+    }
+
+    public String getDriveFileName() {
+        return driveFileName;
+    }
+
+    public void setDriveFileName(String driveFileName) {
+        this.driveFileName = driveFileName;
     }
 
     public Book getBook() {

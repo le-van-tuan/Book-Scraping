@@ -6,6 +6,7 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class GoogleDriverServiceImpl implements GoogleDriverService {
     private final Drive googleDriver = CredentialsGoogleProvider.getDriveService();
 
     @Value(value = "${google.drive.it.ebook.root.folder}")
-    private static String ROOT_FOLDER;
+    private String ROOT_FOLDER;
 
     /**
      *
@@ -76,7 +77,7 @@ public class GoogleDriverServiceImpl implements GoogleDriverService {
         fileMetadata.setParents(Collections.singletonList(rootFolderId));
 
         return googleDriver.files().create(fileMetadata)
-                .setFields("id")
+                .setFields("id, name")
                 .execute();
     }
 
@@ -102,7 +103,7 @@ public class GoogleDriverServiceImpl implements GoogleDriverService {
             InputStreamContent inputStreamContent = new InputStreamContent(GoogleDriverAttributes.PDF_APPLICATION_FILE_TYPE, inputStream);
 
             File driveFile = googleDriver.files().create(fileMetadata, inputStreamContent)
-                    .setFields("id").execute();
+                    .setFields("id, name").execute();
 
             log.info("Uploaded book with name : " +  name);
             return driveFile;
