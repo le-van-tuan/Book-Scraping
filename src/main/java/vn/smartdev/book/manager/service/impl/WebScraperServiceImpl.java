@@ -74,7 +74,7 @@ public class WebScraperServiceImpl implements WebScraperService {
                 String bookDetailLink = getLinkDetail(bookElement);
                 String bookName = bookElement.text();
 
-                if (!bookService.isBookWasDownload(bookName)) {
+                if (!bookService.isBookWasDownloadWithCompletedOrFailedState(bookName)) {
                     Book book = initBookFromName(bookName);
                     BookDetail bookDetail;
                     try {
@@ -82,9 +82,10 @@ public class WebScraperServiceImpl implements WebScraperService {
 
                         File file = uploadBookToGoogleDrive(bookDetail);
 
-                        bookDetail.setState(DownloadState.COMPLETED);
                         bookDetail.setDriveFileId(file.getId());
                         bookDetail.setDriveFileName(file.getName());
+
+                        bookDetail.setState(DownloadState.COMPLETED);
 
                         bookService.saveBookDetail(bookDetail);
                     } catch (IOException e) {

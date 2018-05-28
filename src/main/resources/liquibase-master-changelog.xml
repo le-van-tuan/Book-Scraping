@@ -9,4 +9,6 @@
     <include file="liquibase-changelog/liquibase-changelog-v1.0-addColumnLinkDownloadAndStateToBookDetail.xml" relativeToChangelogFile="true"></include>
     <include file="liquibase-changelog/liquibase-changelog-v1.0-addColumnFileDriveId.xml" relativeToChangelogFile="true"></include>
     <include file="liquibase-changelog/liquibase-changelog-v1.0-changeTypeImage.xml" relativeToChangelogFile="true"></include>
+    <include file="liquibase-changelog/liquibase-changelog-v1.0-createPolicyTable.xml" relativeToChangelogFile="true"></include>
+
 </databaseChangeLog>

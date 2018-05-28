@@ -1,11 +1,13 @@
 package vn.smartdev.book.manager.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import vn.smartdev.book.manager.repository.PolicyRepository;
 
 import java.util.Properties;
 
@@ -13,11 +15,8 @@ import java.util.Properties;
 @PropertySource(value = "classpath:mail.properties")
 public class MailConfig {
 
-    @Value("${mail.sender.username}")
-    private String username;
-
-    @Value("${mail.sender.password}")
-    private String password;
+    @Autowired
+    private PolicyRepository policyRepository;
 
     @Bean
     public JavaMailSender javaMailSender(){
@@ -25,8 +24,8 @@ public class MailConfig {
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
 
-        mailSender.setUsername(username);
-        mailSender.setPassword(password);
+        mailSender.setUsername(policyRepository.findAll().get(0).getUsername());
+        mailSender.setPassword(policyRepository.findAll().get(0).getPassword());
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");

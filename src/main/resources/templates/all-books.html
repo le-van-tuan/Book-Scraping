@@ -1,0 +1,51 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>All it books</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+
+    <script type="text/javascript" th:src="@{book-scrapping-app.js}"></script>
+    <script type="text/javascript" th:src="@{/controller/book-scrapping-controller.js}"></script>
+    <script type="text/javascript" th:src="@{/service/book-scrapping-service.js}"></script>
+</head>
+<body style="background: transparent;" ng-app="bookScrappingModule" ng-controller="BookScrappingController as ctrl">
+<center>
+    <h4 style="color: #31a5ce; font-weight: 700; font-size: 35px; position: relative;">Welcome to all IT Books console</h4>
+</center>
+<center>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Index</th>
+            <th>Name</th>
+            <th>Author</th>
+            <th>Publication date</th>
+            <th>Pages</th>
+            <th>Languages</th>
+            <th>File Size</th>
+            <th>Category</th>
+            <th>Download Status</th>
+        </tr>
+        </thead>
+        <tbody th:each="book,iterator : ${books}">
+            <tr class="success">
+                <td th:text="${iterator.index+1}"></td>
+                <td th:text="${book.book.name}"/>
+                <td th:text="${book.author}"/>
+                <td th:text="${book.publicationDate}"/>
+                <td th:text="${book.pages}"/>
+                <td th:text="${book.languages}"/>
+                <td th:text="${book.fileSize}"/>
+                <td th:text="${book.category}"/>
+                <td th:text="${book.state}"/>
+            </tr>
+        </tbody>
+    </table>
+</center>
+</body>
+</html>

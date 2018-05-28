@@ -9,6 +9,8 @@ import vn.smartdev.book.manager.repository.BookDetailRepository;
 import vn.smartdev.book.manager.repository.BookRepository;
 import vn.smartdev.book.manager.service.BookService;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -35,9 +37,14 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
-    public boolean isBookWasDownload(String name) {
-        BookDetail bookDetail = bookDetailRepository.findByBook_NameAndState(name, DownloadState.COMPLETED);
-        return !Objects.isNull(bookDetail);
+    public boolean isBookWasDownloadWithCompletedOrFailedState(String name) {
+        BookDetail bookDetail = bookDetailRepository.findByBook_NameAndStateIsIn(name, Arrays.asList(DownloadState.COMPLETED,
+                DownloadState.FAILED));
+        if(Objects.isNull(bookDetail)){
+            return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -48,5 +55,10 @@ public class BookServiceImpl implements BookService{
     @Override
     public BookDetail updateBookDetail(BookDetail bookDetail) {
         return bookDetailRepository.save(bookDetail);
+    }
+
+    @Override
+    public List<BookDetail> getAllBooks() {
+        return bookDetailRepository.findAll();
     }
 }
